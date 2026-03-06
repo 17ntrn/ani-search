@@ -34,35 +34,40 @@
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const title = urlParams.get('q');
-        const display = document.getElementById('displayTitle');
-        const copyBtn = document.getElementById('copyBtn');
-        const status = document.getElementById('copy-status');
 
-        if (title) {
-            const decodedTitle = decodeURIComponent(title);
-            display.innerText = decodedTitle;
-            copyBtn.setAttribute('data-clipboard-text', decodedTitle);
-        } else {
-            display.innerText = "No Title Found";
-        }
+document.addEventListener("DOMContentLoaded", async () => {
 
-        // Initialize Clipboard.js
-        const clipboard = new ClipboardJS('#copyBtn');
+    const urlParams = new URLSearchParams(window.location.search);
+    const title = urlParams.get("q");
 
-        clipboard.on('success', function(e) {
-            status.style.visibility = 'visible';
-            setTimeout(() => { status.style.visibility = 'hidden'; }, 2000);
-            e.clearSelection();
-        });
+    const display = document.getElementById("displayTitle");
+    const status = document.getElementById("copy-status");
 
-        clipboard.on('error', function(e) {
-            status.innerText = "Manual copy required";
-            status.style.color = "red";
-            status.style.visibility = 'visible';
-        });
-    </script>
+    if (!title) {
+        display.innerText = "No Title Found";
+        return;
+    }
+
+    const decodedTitle = decodeURIComponent(title);
+    display.innerText = decodedTitle;
+
+    try {
+        await navigator.clipboard.writeText(decodedTitle);
+        status.style.visibility = "visible";
+    } catch {
+        status.innerText = "Clipboard blocked";
+        status.style.color = "red";
+        status.style.visibility = "visible";
+    }
+
+    setTimeout(() => {
+        window.location.href =
+        "intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end";
+    }, 700);
+
+});
+
+</script>
 </body>
 </html>
 
