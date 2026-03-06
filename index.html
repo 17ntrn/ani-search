@@ -1,40 +1,72 @@
 <!DOCTYPE html>
 <html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aniyomi Bridge</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-        .btn { padding: 15px 25px; background: #2e51a2; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 20px; width: 80%; }
-        .status { color: #4CAF50; font-weight: bold; margin-bottom: 10px; }
+        body { background: #121212; color: #e0e0e0; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #1e1e1e; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 85%; max-width: 400px; }
+        h2 { margin-top: 0; color: #2e51a2; }
+        .anime-title { font-weight: bold; color: #fff; margin: 1rem 0; font-size: 1.2rem; }
+        .btn { background: #2e51a2; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0; display: block; text-decoration: none; }
+        .btn-secondary { background: #333; }
+        #copy-status { font-size: 0.8rem; color: #4CAF50; height: 1rem; margin-bottom: 1rem; visibility: hidden; }
     </style>
 </head>
 <body>
-    <div id="status" class="status">Copying title...</div>
-    <div id="title-display" style="font-style: italic; opacity: 0.7;"></div>
-    
-    <button class="btn" onclick="openAniyomi()">Open Aniyomi</button>
+
+    <div class="card">
+        <h2>Aniyomi Link</h2>
+        <div id="copy-status">Title Copied!</div>
+        <div class="anime-title" id="displayTitle">Loading...</div>
+
+        <button class="btn" id="copyBtn" data-clipboard-text="">
+            1. Copy Title
+        </button>
+
+        <a href="intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end" class="btn btn-secondary">
+            2. Open Aniyomi
+        </a>
+    </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const animeTitle = urlParams.get('q');
-        
-        if (animeTitle) {
-            document.getElementById('title-display').innerText = `"${animeTitle}"`;
-            
-            // 1. Copy to Clipboard automatically
-            navigator.clipboard.writeText(animeTitle).then(() => {
-                document.getElementById('status').innerText = "✅ Title copied to clipboard!";
-            }).catch(err => {
-                document.getElementById('status').innerText = "❌ Copy failed. Tap below to copy.";
-                document.getElementById('status').style.color = "red";
-            });
+        const title = urlParams.get('q');
+        const display = document.getElementById('displayTitle');
+        const copyBtn = document.getElementById('copyBtn');
+        const status = document.getElementById('copy-status');
+
+        if (title) {
+            const decodedTitle = decodeURIComponent(title);
+            display.innerText = decodedTitle;
+            copyBtn.setAttribute('data-clipboard-text', decodedTitle);
+        } else {
+            display.innerText = "No Title Found";
         }
 
-        function openAniyomi() {
-            // This attempts to open the app via its package name
-            // If this fails, it stays on the page, and you can manually switch apps
-            window.location.href = "intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end";
+        // Initialize Clipboard.js
+        const clipboard = new ClipboardJS('#copyBtn');
+
+        clipboard.on('success', function(e) {
+            status.style.visibility = 'visible';
+            setTimeout(() => { status.style.visibility = 'hidden'; }, 2000);
+            e.clearSelection();
+        });
+
+        clipboard.on('error', function(e) {
+            status.innerText = "Manual copy required";
+            status.style.color = "red";
+            status.style.visibility = 'visible';
+        });
+    </script>
+</body>
+</html>
+
+tion.href = "intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end";
         }
     </script>
 </body>
