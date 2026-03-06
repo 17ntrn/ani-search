@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aniyomi Redirector</title>
+</head>
+<body>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const animeTitle = urlParams.get('q');
+
+        if (animeTitle) {
+            // This is the core logic that triggers the Android system
+            const intentUri = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(animeTitle)};end`;
+            window.location.replace(intentUri);
+        } else {
+            document.body.innerHTML = "<h3>Error: No anime title provided in URL (?q=title)</h3>";
+        }
+    </script>
+</body>
+</html>
+
