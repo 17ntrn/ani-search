@@ -2,30 +2,39 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Aniyomi Redirect</title>
+    <title>Aniyomi Bridge</title>
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .btn { padding: 15px 25px; background: #2e51a2; color: white; border: none; border-radius: 8px; font-size: 18px; text-decoration: none; cursor: pointer; }
+        body { background: #121212; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .btn { padding: 15px 25px; background: #2e51a2; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 20px; width: 80%; }
+        .status { color: #4CAF50; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <p id="status">Redirecting to Aniyomi...</p>
-    <button class="btn" onclick="trigger()">Open Aniyomi Manually</button>
+    <div id="status" class="status">Copying title...</div>
+    <div id="title-display" style="font-style: italic; opacity: 0.7;"></div>
+    
+    <button class="btn" onclick="openAniyomi()">Open Aniyomi</button>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const animeTitle = urlParams.get('q');
-        const intentUri = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(animeTitle)};end`;
-
-        function trigger() {
-            window.location.href = intentUri;
+        
+        if (animeTitle) {
+            document.getElementById('title-display').innerText = `"${animeTitle}"`;
+            
+            // 1. Copy to Clipboard automatically
+            navigator.clipboard.writeText(animeTitle).then(() => {
+                document.getElementById('status').innerText = "✅ Title copied to clipboard!";
+            }).catch(err => {
+                document.getElementById('status').innerText = "❌ Copy failed. Tap below to copy.";
+                document.getElementById('status').style.color = "red";
+            });
         }
 
-        if (animeTitle) {
-            // Attempt auto-redirect after 500ms
-            setTimeout(trigger, 500);
-        } else {
-            document.getElementById('status').innerText = "No title found.";
+        function openAniyomi() {
+            // This attempts to open the app via its package name
+            // If this fails, it stays on the page, and you can manually switch apps
+            window.location.href = "intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end";
         }
     </script>
 </body>
