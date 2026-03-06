@@ -1,21 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Aniyomi Redirector</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aniyomi Redirect</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .btn { padding: 15px 25px; background: #2e51a2; color: white; border: none; border-radius: 8px; font-size: 18px; text-decoration: none; cursor: pointer; }
+    </style>
 </head>
 <body>
+    <p id="status">Redirecting to Aniyomi...</p>
+    <button class="btn" onclick="trigger()">Open Aniyomi Manually</button>
+
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const animeTitle = urlParams.get('q');
+        const intentUri = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(animeTitle)};end`;
+
+        function trigger() {
+            window.location.href = intentUri;
+        }
 
         if (animeTitle) {
-            // This is the core logic that triggers the Android system
-            const intentUri = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(animeTitle)};end`;
-            window.location.replace(intentUri);
+            // Attempt auto-redirect after 500ms
+            setTimeout(trigger, 500);
         } else {
-            document.body.innerHTML = "<h3>Error: No anime title provided in URL (?q=title)</h3>";
+            document.getElementById('status').innerText = "No title found.";
         }
     </script>
 </body>
 </html>
-
