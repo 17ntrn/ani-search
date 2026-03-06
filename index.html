@@ -1,78 +1,292 @@
 <!DOCTYPE html>
-<html>
-<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aniyomi Bridge</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
-    <style>
-        body { background: #121212; color: #e0e0e0; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #1e1e1e; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 85%; max-width: 400px; }
-        h2 { margin-top: 0; color: #2e51a2; }
-        .anime-title { font-weight: bold; color: #fff; margin: 1rem 0; font-size: 1.2rem; }
-        .btn { background: #2e51a2; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0; display: block; text-decoration: none; }
-        .btn-secondary { background: #333; }
-        #copy-status { font-size: 0.8rem; color: #4CAF50; height: 1rem; margin-bottom: 1rem; visibility: hidden; }
-    </style>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Aniyomi Bridge</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+body{
+
+background:#0f1115;
+font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+color:#e6e6e6;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+height:100vh;
+
+}
+
+.card{
+
+background:#181b21;
+border-radius:18px;
+padding:40px;
+
+width:90%;
+max-width:420px;
+
+text-align:center;
+
+box-shadow:
+0 20px 60px rgba(0,0,0,.6),
+0 0 0 1px rgba(255,255,255,.04);
+
+animation:fade .6s ease;
+
+}
+
+@keyframes fade{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+h1{
+
+font-size:1.5rem;
+margin-bottom:20px;
+
+background:linear-gradient(90deg,#5f7cff,#8ca8ff);
+-webkit-background-clip:text;
+color:transparent;
+
+}
+
+.title{
+
+font-size:1.15rem;
+font-weight:600;
+
+background:#0f1115;
+
+padding:12px;
+border-radius:8px;
+
+margin-bottom:18px;
+
+word-break:break-word;
+
+}
+
+.status{
+
+font-size:.85rem;
+margin-bottom:20px;
+opacity:.85;
+
+}
+
+button{
+
+border:none;
+background:linear-gradient(135deg,#4c6fff,#6f8dff);
+color:white;
+
+padding:14px 18px;
+border-radius:10px;
+
+font-weight:600;
+font-size:.95rem;
+
+cursor:pointer;
+
+width:100%;
+
+transition:.2s;
+
+}
+
+button:hover{
+
+transform:translateY(-1px);
+box-shadow:0 5px 20px rgba(0,0,0,.4);
+
+}
+
+.secondary{
+
+margin-top:12px;
+
+background:#2b2f39;
+
+}
+
+input{
+
+opacity:0;
+position:absolute;
+pointer-events:none;
+
+}
+
+.footer{
+
+margin-top:18px;
+font-size:.75rem;
+opacity:.6;
+
+}
+
+</style>
+
 </head>
+
+
 <body>
 
-    <div class="card">
-        <h2>Aniyomi Link</h2>
-        <div id="copy-status">Title Copied!</div>
-        <div class="anime-title" id="displayTitle">Loading...</div>
+<div class="card">
 
-        <button class="btn" id="copyBtn" data-clipboard-text="">
-            1. Copy Title
-        </button>
+<h1>Aniyomi Bridge</h1>
 
-        <a href="intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end" class="btn btn-secondary">
-            2. Open Aniyomi
-        </a>
-    </div>
+<div class="title" id="title">
+Loading...
+</div>
 
-    <script>
+<div class="status" id="status">
+Preparing link
+</div>
 
-document.addEventListener("DOMContentLoaded", async () => {
+<button id="manualCopy">
+Copy Title
+</button>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const title = urlParams.get("q");
+<button class="secondary" id="openAniyomi">
+Open Aniyomi
+</button>
 
-    const display = document.getElementById("displayTitle");
-    const status = document.getElementById("copy-status");
+<input id="pasteAssist">
 
-    if (!title) {
-        display.innerText = "No Title Found";
-        return;
-    }
+<div class="footer">
+Auto redirecting...
+</div>
 
-    const decodedTitle = decodeURIComponent(title);
-    display.innerText = decodedTitle;
+</div>
 
-    try {
-        await navigator.clipboard.writeText(decodedTitle);
-        status.style.visibility = "visible";
-    } catch {
-        status.innerText = "Clipboard blocked";
-        status.style.color = "red";
-        status.style.visibility = "visible";
-    }
 
-    setTimeout(() => {
-        window.location.href =
-        "intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end";
-    }, 700);
+<script>
 
-});
+const params = new URLSearchParams(window.location.search);
+const titleParam = params.get("q");
+
+const titleEl = document.getElementById("title");
+const statusEl = document.getElementById("status");
+
+const manualCopyBtn = document.getElementById("manualCopy");
+const openBtn = document.getElementById("openAniyomi");
+
+const assistInput = document.getElementById("pasteAssist");
+
+let decodedTitle="";
+
+if(titleParam){
+
+decodedTitle = decodeURIComponent(titleParam);
+titleEl.textContent = decodedTitle;
+
+}else{
+
+titleEl.textContent = "No title found";
+
+}
+
+
+
+async function copyTitle(){
+
+try{
+
+await navigator.clipboard.writeText(decodedTitle);
+
+statusEl.textContent="Title copied to clipboard";
+
+}catch{
+
+statusEl.textContent="Clipboard blocked. Tap copy.";
+
+}
+
+}
+
+
+
+function openAniyomi(){
+
+window.location.href =
+"intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end";
+
+}
+
+
+
+manualCopyBtn.onclick = async()=>{
+
+await copyTitle();
+openAniyomi();
+
+};
+
+
+
+openBtn.onclick = openAniyomi;
+
+
+
+async function startFlow(){
+
+if(!decodedTitle) return;
+
+await copyTitle();
+
+/* keyboard paste suggestion trick */
+
+assistInput.focus();
+
+assistInput.value = decodedTitle;
+
+setTimeout(()=>{
+
+assistInput.blur();
+
+},200);
+
+
+
+setTimeout(()=>{
+
+openAniyomi();
+
+},900);
+
+}
+
+
+
+document.addEventListener("DOMContentLoaded",startFlow);
 
 </script>
-</body>
-</html>
 
-tion.href = "intent:#Intent;component=eu.kanade.tachiyomi.ui.main.MainActivity;end";
-        }
-    </script>
 </body>
+
 </html>
